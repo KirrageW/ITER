@@ -3,7 +3,9 @@ from django.db import models
 # Create your models here. edited 5.3 creating models
 class Category(models.Model):
     name = models.CharField(max_length=128, unique=True) #every category must be unique
-
+    views = models.IntegerField(default=0) #chapter 5 exercise - add views
+    likes = models.IntegerField(default=0) #add likes. both with default 0
+    
     class Meta:
         verbose_name_plural = 'Categories'
 

@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from rango.models import Category
 from rango.models import Page
+from rango.forms import CategoryForm
 
 def index(request):
     #some kind of dictionary that defines template things - template variable called boldmessage
@@ -60,7 +61,34 @@ def show_category(request, category_name_slug): #swear this changes to url
 #           - if this category slug is found in category model, we pull associated pages, and
 #               add to context_dict
     
-    
+def add_category(request):
+    form = CategoryForm()
+
+    #for http post
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+
+        #is form valid
+        if form.is_valid():
+            #save new category to database
+            form.save(commit=True)
+            #now cat is saved, could give confirmation message
+            return index(request)
+        else:
+            #if supplied form contains errors, print to terminal
+            print(form.errors)
+
+    #will handle bad form, new form, or no form cases
+    #render form with error messages if any
+    return render(request, 'rango/add_category.html', {'form': form})
+#here we have created a category form, checked if http request was a POST
+#which is a user submitted data form.
+#we then can handle the post request through the same URL
+#the add_category( view function can handle three different scenarios - page 84
+
+    #http get used to request representation of specified resource
+    # http post submits data from clients browser to be processed 
+            
 
 
 

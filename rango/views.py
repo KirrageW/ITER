@@ -21,7 +21,7 @@ def about(request):
     return render(request, 'rango/about.html', context=context_dict)
 
 #6.3 making category pages accessible via slugs 
-def show_category(request, category_name_url):
+def show_category(request, category_name_slug):
     #create context dictionary as per - gets passed to template renderer eng.
     context_dict = {}
 

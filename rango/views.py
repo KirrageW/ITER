@@ -10,7 +10,9 @@ def index(request):
     #then retreive top 5 only. place list in context_dict dictionary (which is passed
     #to template engine
     category_list = Category.objects.order_by('-likes')[:5]
-    context_dict = {'categories': category_list}
+    page_list = Page.objects.order_by('-views')[:5] #chap6 exs
+    context_dict = {'categories': category_list, 'pages': page_list}   #chap6 ex - passed list to context
+  
     
     #returns response to client, render function takes user input, template
     #filename amd context dictionary - mash with template to form full html page...
@@ -21,7 +23,7 @@ def about(request):
     return render(request, 'rango/about.html', context=context_dict)
 
 #6.3 making category pages accessible via slugs 
-def show_category(request, category_name_slug):
+def show_category(request, category_name_slug): #swear this changes to url
     #create context dictionary as per - gets passed to template renderer eng.
     context_dict = {}
 

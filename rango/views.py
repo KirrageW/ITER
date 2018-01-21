@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from rango.models import Category
 from rango.models import Page
 from rango.forms import CategoryForm
+from rango.forms import PageForm
 
 def index(request):
     #some kind of dictionary that defines template things - template variable called boldmessage
@@ -71,7 +72,8 @@ def add_category(request):
         #is form valid
         if form.is_valid():
             #save new category to database
-            form.save(commit=True)
+            cat = form.save(commit=True) #adding cat = , somhow gives confirmation, by giving reference to instance of cat object created by the form
+            print(cat, cat.slug) #prints to console as a confirmation ... page 87 i
             #now cat is saved, could give confirmation message
             return index(request)
         else:
@@ -87,7 +89,29 @@ def add_category(request):
 #the add_category( view function can handle three different scenarios - page 84
 
     #http get used to request representation of specified resource
-    # http post submits data from clients browser to be processed 
+    # http post submits data from clients browser to be processed
+
+def add_page(request, category_name_slug):
+    try:
+        category = Category.objects.get(slug=category_name_slug)
+    except Category.DoesNotExist:
+        category = None
+
+    form = PageForm()
+    if request.method == 'POST':
+        form = PageForm(request.POST)
+        if form.is_valid():
+            if category:
+                page = form.save(commit=False)
+                page.category = category
+                page.views = 0
+                page.save()
+                return show_category(request, category_name_slug)
+            else:
+                print(form.errors)
+
+    context_dict = {'form':form, 'category': category}
+    return render(request, 'rango/add_page.html', context_dict)
             
 
 

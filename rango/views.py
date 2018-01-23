@@ -5,6 +5,7 @@ from rango.models import Category
 from rango.models import Page
 from rango.forms import CategoryForm
 from rango.forms import PageForm
+from rango.forms import UserForm, UserProfileForm
 
 def index(request):
     #some kind of dictionary that defines template things - template variable called boldmessage
@@ -116,6 +117,68 @@ def add_page(request, category_name_slug):
 
     context_dict = {'form':form, 'category': category}
     return render(request, 'rango/add_page.html', context_dict)
+
+def register(request):
+    #boolean was registration successful?
+    registered = False
+
+    #if http post, we want to process form data
+    if request.method == 'POST':
+        #attempt to grab information from the raw form info
+        #note that we make user of both UserForm and UserProfileForm
+        user_form = UserForm(data=request.POST)
+        profile_form = UserProfileForm(data=request.POST)
+
+        #if two forms are valid
+        if user_form.is_valid() and profile_form.is_valid():
+            #save users form to db
+            user = user_form.save()
+
+            #now we hash password with set_password method
+            #once hashed, we can update the user object
+            user.set_password(user.password)
+            user.save()
+
+            #now sort out UserProfile instance
+            #since we need to set the user attribute ourselves, we set
+            #commit=False. this delays saving model until we're ready
+            #to avoid integrity problems
+            profile = profile_form.save(commit=False)
+            profile.user = user
+
+            #did the user provide a profile picture?
+            #if yes, get it from input form and put in userprofile model
+            if 'picture' in request.FILES:
+                profile.picture = request.FILES['picture']
+
+            #now save UserProfile model instance
+            profile.save()
+
+            #update our variable to indicate that the template registration
+            #was successful
+            registered = True
+        else:
+            #invalid form or forms, print problems to terminal
+            print(user_form.errors, profile_form.errors)
+    else:
+        #not http post, so we render our form using two ModelForm instances
+        #these forms will be blank, ready for user input
+        user_form = UserForm()
+        profile_form = UserProfileForm()
+
+    #render the template depending on the context
+    return render(request,
+                  'rango/register.html',
+                  {'user_form': user_form,
+                   'profile_form': profile_form,
+                   'registered': registered})
+
+#what is going on here then: similar to how we implemented the add category and add page views
+# here we also handle two distinct modelform instances. we also need to handle a user's
+#profile image if they upload one
+#futerhmore, we need to link the two model instances. after creating the new user model instance
+#we reference it in userprofile instance with the line profile.user = user. this is where
+#we populate the user attribute of the userprofileform form, which we hid from users.
             
 
 

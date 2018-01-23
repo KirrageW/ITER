@@ -1,5 +1,6 @@
 from django.contrib import admin
-from rango.models import Category, Page
+from rango.models import Category, Page, UserProfile
+
 
 #6.3 slugging - auto generates slugs as we type category name
 class CategoryAdmin(admin.ModelAdmin):
@@ -11,6 +12,8 @@ class PageAdmin(admin.ModelAdmin):
 # Register your models here.
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Page, PageAdmin)
+admin.site.register(UserProfile)
+
 
 
 

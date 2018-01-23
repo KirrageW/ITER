@@ -8,7 +8,8 @@ urlpatterns = [
     url(r'^category/(?P<category_name_slug>[\w\-]+)/add_page/', views.add_page, name='add_page'), #chap 7 ex
     url(r'^category/(?P<category_name_slug>[\w\-]+)/$', #note parameter name in url pattern - need to declare in view
         views.show_category, name='show_category'), #\w for alphanumeric chars,\- for hypens. []+ means match as many as like
-    
+    url(r'^register/$', views.register,
+        name='register'),
     ]
 #all view functions in django apps must take a parameter - typicalyl called request. gives access to info frelated to given http request made by user
 # for urls - need an additional named parameter for the signature for the given view, too

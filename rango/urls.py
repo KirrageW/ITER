@@ -10,6 +10,9 @@ urlpatterns = [
         views.show_category, name='show_category'), #\w for alphanumeric chars,\- for hypens. []+ means match as many as like
     url(r'^register/$', views.register,
         name='register'),
+    url(r'^login/$', views.user_login, name='login'),
+    url(r'^restricted/', views.restricted, name='restricted'),
+    url(r'^logout/$', views.user_logout, name='logout'),
     ]
 #all view functions in django apps must take a parameter - typicalyl called request. gives access to info frelated to given http request made by user
 # for urls - need an additional named parameter for the signature for the given view, too

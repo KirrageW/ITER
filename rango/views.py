@@ -11,27 +11,44 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from datetime import datetime
 
 def index(request):
+    request.session.set_test_cookie()
+
     #some kind of dictionary that defines template things - template variable called boldmessage
     #chapter 6 - query db for list of all categories, order by number of likes (desc)
     #then retreive top 5 only. place list in context_dict dictionary (which is passed
     #to template engine
     category_list = Category.objects.order_by('-likes')[:5]
     page_list = Page.objects.order_by('-views')[:5] #chap6 exs
-    context_dict = {'categories': category_list, 'pages': page_list}   #chap6 ex - passed list to context
+    context_dict = {'categories': category_list, 'pages': page_list}   #chap6 ex- passed list to context
+
+   
+    visitor_cookie_handler(request)
+    context_dict['vists'] = request.session['visits']
+
+    response = render(request, 'rango/index.html', context=context_dict)
+    return response
   
     
-    #returns response to client, render function takes user input, template
-    #filename amd context dictionary - mash with template to form full html page...
-    return render(request, 'rango/index.html', context_dict)
 
 def about(request):
+    context_dict = {}
+    if request.session.test_cookie_worked():
+        print("TEST COOKIE WORKED!")
+        request.session.delete_test_cookie()
+
+
+    viewcounts = request.session.get('visits', 0)
+    context_dict['visit_count'] = viewcounts
+    
+    
     # prints out whether method is a GET or a POST
     print(request.method)
     #prints out the user name, if no one is looged in it prints 'AnonymousUser'
     print(request.user)
-    context_dict = {'boldmessage2': "I do hope this works"} #PAGE101 for render and context
+    
     return render(request, 'rango/about.html', context=context_dict)
 
 #6.3 making category pages accessible via slugs 
@@ -216,11 +233,42 @@ def user_login(request):
 @login_required  
 def restricted(request):
     return render(request, 'rango/restricted.html', {})
-   
-    
 
+  
 @login_required
 def user_logout(request):
     logout(request)
     return HttpResponseRedirect(reverse('index'))
+
+#helper
+def get_server_side_cookie(request, cookie, default_val=None):
+    val = request.session.get(cookie)
+    if not val:
+        val = default_val
+    return val
+
+
+
+#helper function cookies
+def visitor_cookie_handler(request):
+    visits = int(get_server_side_cookie(request, 'visits', '1'))
+
+    last_visit_cookie = get_server_side_cookie(request, 'last_visit', str(datetime.now()))
+    last_visit_time = datetime.strptime(last_visit_cookie[:-7],
+                                        '%Y-%m-%d %H:%M:%S')
+    #if been morethan a day
+    if (datetime.now() - last_visit_time).days > 0:
+        visits = vists + 1
+        #uupdate last visit cookie now we have updated count
+        request.session['last_visit'] = str(datetime.now())
+    else:
+        visits = 1
+        #set last visit cookie
+        request.session['last_visit'] = last_visit_cookie
+
+    #update/set visits cookie
+    request.session['visits'] = visits
+    
+                                                              
+
     

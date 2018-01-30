@@ -10,11 +10,13 @@
 	<h1>About Rango</h1>
 	<div>
 	    here is the about page. <br/>
-	    You've visited the site this many times: <strong>{{ visit_count }}</strong><br/>
+	    Visits: <strong>{{ visit_count }}</strong><br/>
 	</div>
 	<div>
-	    <img src="{{ MEDIA_URL }}cat.jpg" 
+	    	<img src="{{ MEDIA_URL }}cat.jpg" 
 	         alt="A picture of a cat" />
+		<br>
+		<img src="{% static "images/cat1.jpg" %}" alt="Second cat" />
 	</div>
 	<div> 
 	    This tutorial has been put together by William Kirrage.

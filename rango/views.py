@@ -28,7 +28,7 @@ def index(request):
     visitor_cookie_handler(request)
     context_dict['visits'] = request.session['visits']
 
-    response = render(request, 'rango/index.html', context_dict)
+    response = render(request, 'rango/index.html', context=context_dict)
     return response
   
     
@@ -40,8 +40,8 @@ def about(request):
         request.session.delete_test_cookie()
 
 
-    viewcounts = request.session.get('visits', 0)
-    context_dict['visit_count'] = viewcounts
+    visitcounts = request.session.get('visits', 0)
+    context_dict['visit_count'] = visitcounts
     
     
     # prints out whether method is a GET or a POST
@@ -258,7 +258,7 @@ def visitor_cookie_handler(request):
                                         '%Y-%m-%d %H:%M:%S')
     #if been morethan a day
     if (datetime.now() - last_visit_time).days > 0:
-        visits = vists + 1
+        visits = visits + 1
         #uupdate last visit cookie now we have updated count
         request.session['last_visit'] = str(datetime.now())
     else:
